@@ -31,6 +31,12 @@ struct SystemSpeechRecognizerTests {
     }
 
     @Test
+    func customLanguageModelPreparationSkipsPreMacOS26Runtimes() {
+        #expect(!SystemASRCustomLanguageModelAvailability.canPrepare(operatingSystemMajorVersion: 15))
+        #expect(SystemASRCustomLanguageModelAvailability.canPrepare(operatingSystemMajorVersion: 26))
+    }
+
+    @Test
     func fileRecognitionTimeoutScalesWithAudioDuration() {
         #expect(SystemASRFileRecognitionTimeoutPlanner.timeoutSeconds(audioDurationSeconds: nil) == 20)
         #expect(SystemASRFileRecognitionTimeoutPlanner.timeoutSeconds(audioDurationSeconds: -1) == 20)

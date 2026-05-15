@@ -1,5 +1,8 @@
 import Foundation
 import CoreGraphics
+#if canImport(AppKit)
+import AppKit
+#endif
 
 public enum HUDSurfaceMetrics {
     public static let usesSystemShadow = false
@@ -265,6 +268,40 @@ public enum ActionPanelContentTransparencyPolicy {
     public static let clipViewDrawsBackground = false
     public static let textViewDrawsBackground = false
 }
+
+#if canImport(AppKit)
+public enum ActionPanelTextViewLayoutPolicy {
+    public static let isHorizontallyResizable = false
+    public static let isVerticallyResizable = true
+    public static let widthTracksTextView = true
+    public static let autoresizingMask: NSView.AutoresizingMask = [.width]
+
+    public static func apply(to textView: NSTextView) {
+        textView.minSize = NSSize(width: 0, height: 0)
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.isHorizontallyResizable = isHorizontallyResizable
+        textView.isVerticallyResizable = isVerticallyResizable
+        textView.autoresizingMask = autoresizingMask
+        textView.textContainer?.widthTracksTextView = widthTracksTextView
+        textView.textContainer?.containerSize = NSSize(
+            width: textView.bounds.width,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+    }
+}
+
+public enum ActionPanelScrollViewPolicy {
+    public static let hasVerticalScroller = true
+    public static let autohidesScrollers = true
+    public static let scrollerStyle: NSScroller.Style = .overlay
+
+    public static func apply(to scrollView: NSScrollView) {
+        scrollView.hasVerticalScroller = hasVerticalScroller
+        scrollView.autohidesScrollers = autohidesScrollers
+        scrollView.scrollerStyle = scrollerStyle
+    }
+}
+#endif
 
 public enum HUDPaletteResolver {
     public static func resolve(surface: HUDResolvedSurface, status: HUDStatusTone) -> HUDPalette {

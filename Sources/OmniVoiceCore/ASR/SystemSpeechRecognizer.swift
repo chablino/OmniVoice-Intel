@@ -185,6 +185,7 @@ public final class SystemSpeechRecognizer: @unchecked Sendable {
         keywords: [String]
     ) async throws -> SFSpeechLanguageModel.Configuration? {
         guard !keywords.isEmpty else { return nil }
+        guard SystemASRCustomLanguageModelAvailability.canPrepare() else { return nil }
         let supportDirectory = try applicationSupportDirectory()
             .appendingPathComponent("SpeechLanguageModels", isDirectory: true)
         try fileManager.createDirectory(at: supportDirectory, withIntermediateDirectories: true)

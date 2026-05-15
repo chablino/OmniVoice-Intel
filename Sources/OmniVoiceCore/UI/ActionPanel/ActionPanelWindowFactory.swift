@@ -140,6 +140,7 @@ enum ActionPanelWindowFactory {
         textView.font = GlassTypography.actionPanelBodyFont(for: .darkCapsule)
         textView.textContainerInset = NSSize(width: 10, height: 12)
         textView.textContainer?.lineFragmentPadding = 0
+        ActionPanelTextViewLayoutPolicy.apply(to: textView)
         textView.onPrimary = onPrimary
         textView.onCancel = onCancel
         return textView
@@ -148,7 +149,7 @@ enum ActionPanelWindowFactory {
     private static func makeScrollView(textView: ActionPanelTextView) -> NSScrollView {
         let scrollView = NSScrollView()
         scrollView.documentView = textView
-        scrollView.hasVerticalScroller = true
+        ActionPanelScrollViewPolicy.apply(to: scrollView)
         scrollView.drawsBackground = ActionPanelContentTransparencyPolicy.scrollViewDrawsBackground
         scrollView.contentView.drawsBackground = ActionPanelContentTransparencyPolicy.clipViewDrawsBackground
         scrollView.contentView.backgroundColor = .clear

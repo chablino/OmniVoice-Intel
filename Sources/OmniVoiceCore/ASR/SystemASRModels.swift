@@ -98,6 +98,14 @@ public enum SystemASRRuntimeRecoveryPlanner {
     }
 }
 
+public enum SystemASRCustomLanguageModelAvailability {
+    public static func canPrepare(
+        operatingSystemMajorVersion: Int = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
+    ) -> Bool {
+        operatingSystemMajorVersion >= 26
+    }
+}
+
 public struct SystemASRSettings: Equatable, Sendable {
     public let engine: SystemASREngine
     public let keywordHintsEnabled: Bool

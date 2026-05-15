@@ -370,4 +370,19 @@ struct HUDAndActionPanelTests {
         #expect(ActionPanelTextAlignmentPolicy.title == .center)
         #expect(ActionPanelTextAlignmentPolicy.body == .natural)
     }
+
+    @Test
+    func actionPanelTextViewLayoutTracksScrollWidth() {
+        #expect(ActionPanelTextViewLayoutPolicy.isHorizontallyResizable == false)
+        #expect(ActionPanelTextViewLayoutPolicy.isVerticallyResizable)
+        #expect(ActionPanelTextViewLayoutPolicy.widthTracksTextView)
+        #expect(ActionPanelTextViewLayoutPolicy.autoresizingMask.contains(.width))
+    }
+
+    @Test
+    func actionPanelScrollViewUsesOverlayAutohidingScroller() {
+        #expect(ActionPanelScrollViewPolicy.hasVerticalScroller)
+        #expect(ActionPanelScrollViewPolicy.autohidesScrollers)
+        #expect(ActionPanelScrollViewPolicy.scrollerStyle == .overlay)
+    }
 }
