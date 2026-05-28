@@ -35,9 +35,9 @@
       "default_model": "mimo-v2.5"
     }
   },
-  // System ASR settings. Apple online recognition is an explicit engine choice and may send audio to Apple.
+  // System ASR settings. Apple online recognition and external_asr are explicit engine choices and may send audio to their services.
   "system_asr": {
-    // Recognition engine: speech_analyzer is the default on-device engine and requires macOS 26+; classic_speech uses classic on-device recognition; apple_online_speech allows Apple online recognition.
+    // Recognition engine: speech_analyzer is the default on-device engine and requires macOS 26+; classic_speech uses classic on-device recognition; apple_online_speech allows Apple online recognition; external_asr uses an installed external ASR plugin.
     "engine": "speech_analyzer",
     // Whether enabled keyword groups are supplied to System ASR as contextual hints.
     "keyword_hints_enabled": true

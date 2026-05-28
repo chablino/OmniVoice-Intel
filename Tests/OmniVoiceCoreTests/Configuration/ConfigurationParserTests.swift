@@ -210,6 +210,51 @@ extension ConfigurationTests {
     }
 
     @Test
+    func configLoaderFallsBackWhenLegacyDoubaoIMEEngineIsPresent() throws {
+        let fixture = try configFixture(slug: "omnivoice-legacy-doubao-asr")
+        try fixture.write("""
+        {
+          "active_source": "auto",
+          "transcription_pipeline": { "mode": "system_asr_only" },
+          "system_asr": {
+            "engine": "doubao_ime",
+            "keyword_hints_enabled": true,
+            "doubao_ime": {
+              "enabled": true,
+              "node_executable": "/opt/homebrew/bin/node",
+              "cli_path": "~/to7for/mine/doubaoASR/doubaoime-asr-nodejs/dist/cli.mjs",
+              "credential_path": "~/to7for/mine/doubaoASR/doubaoime-asr-nodejs/credentials-asr-test.json",
+              "timeout_seconds": 45
+            }
+          },
+          "preferences": {
+            "ui_language": "zh-Hans",
+            "transcription_style": "rewrite",
+            "keyword_hints_enabled": false,
+            "enabled_keyword_groups": [],
+            "trigger_key": "fn-globe",
+            "min_recording_duration_ms": 500,
+            "max_recording_duration_seconds": 120,
+            "auto_insert": true,
+            "launch_at_login": true,
+            "hud": {
+              "visual_style": "automatic",
+              "message_duration_seconds": 3,
+              "reveal_delay_ms": 100,
+              "live_asr_preview_enabled": false
+            }
+          }
+        }
+        """)
+
+        let config = fixture.loader.load()
+
+        #expect(config.pipelineMode == .systemASROnly)
+        #expect(config.systemASRSettings.engine == .defaultEngine)
+        #expect(config.systemASRSettings.keywordHintsEnabled)
+    }
+
+    @Test
     func configLoaderMergesUserOverridesWithCanonicalDefaults() throws {
         let fixture = try configFixture(slug: "omnivoice-config-overrides")
         try fixture.write("""

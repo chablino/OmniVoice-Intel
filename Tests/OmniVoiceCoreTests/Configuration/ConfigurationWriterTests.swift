@@ -21,6 +21,9 @@ extension ConfigurationTests {
         #expect(!raw.contains("display_name_zh"))
         #expect(!raw.contains("description_zh"))
         #expect(!raw.contains("allow_apple_server_recognition"))
+        #expect(!raw.contains(#""legacy_private_asr""#))
+        #expect(!raw.contains(#""doubao_ime""#))
+        #expect(!raw.contains("Acme ASR settings"))
 
         let normalized = try #require(JSONCNormalizer.normalize(raw).data(using: .utf8))
         let object = try #require(JSONSerialization.jsonObject(with: normalized) as? [String: Any])
@@ -32,6 +35,24 @@ extension ConfigurationTests {
         #expect(audioLLM["extra_models"] is [String])
         #expect(textLLM["default_model"] as? String == "mimo-v2.5")
         #expect(textLLM["extra_models"] == nil)
+    }
+
+    @Test
+    func configWriterEmitsExternalASRProviderSelection() throws {
+        let config = MimoConfig(
+            pipelineMode: .systemASROnly,
+            systemASRSettings: SystemASRSettings(
+                engine: .externalASR,
+                keywordHintsEnabled: false,
+                externalASR: ExternalASRSettings(providerID: "acme-asr")
+            )
+        )
+
+        let raw = ConfigDocumentWriter.document(config: config, uiLanguage: .english)
+
+        #expect(raw.contains(#""engine": "external_asr""#))
+        #expect(raw.contains(#""external_asr""#))
+        #expect(raw.contains(#""provider_id": "acme-asr""#))
     }
 
     @MainActor
@@ -110,18 +131,25 @@ extension ConfigurationTests {
         let systemASR = try #require(object["system_asr"] as? [String: Any])
         #expect(systemASR["engine"] as? String == "classic_speech")
         #expect(systemASR["keyword_hints_enabled"] as? Bool == false)
+        #expect(systemASR["doubao_ime"] == nil)
 
         #expect(store.saveModelAndPipelineSettings(
             inputAudioModel: .mimoV25,
             textLLMModel: .mimoV25Pro,
             pipelineMode: .systemASROnly,
-            systemASRSettings: SystemASRSettings(engine: .classicSpeech, keywordHintsEnabled: true),
+            systemASRSettings: SystemASRSettings(
+                engine: .externalASR,
+                keywordHintsEnabled: false,
+                externalASR: ExternalASRSettings(providerID: "acme-asr")
+            ),
             uiLanguage: .english
         ))
-        #expect(store.config.pipelineMode == .systemASROnly)
-        let systemOnlyObject = try fixture.object()
-        let systemOnlyPipeline = try #require(systemOnlyObject["transcription_pipeline"] as? [String: Any])
-        #expect(systemOnlyPipeline["mode"] as? String == "system_asr_only")
+        let externalObject = try fixture.object()
+        let externalSystemASR = try #require(externalObject["system_asr"] as? [String: Any])
+        #expect(externalSystemASR["engine"] as? String == "external_asr")
+        let externalASR = try #require(externalSystemASR["external_asr"] as? [String: Any])
+        #expect(externalASR["provider_id"] as? String == "acme-asr")
+        #expect(externalSystemASR["doubao_ime"] == nil)
     }
 
     @Test

@@ -150,10 +150,26 @@ extension ConfigLoader {
 
     func parseSystemASRSettings(_ object: [String: Any]?) -> SystemASRSettings {
         let engine = (object?[ConfigSchema.SystemASR.engine] as? String).flatMap(SystemASREngine.init(rawValue:)) ?? .defaultEngine
+        let externalASR = parseExternalASRSettings(object?[ConfigSchema.SystemASR.externalASR] as? [String: Any])
         return SystemASRSettings(
             engine: engine,
-            keywordHintsEnabled: object?[ConfigSchema.SystemASR.keywordHintsEnabled] as? Bool ?? true
+            keywordHintsEnabled: object?[ConfigSchema.SystemASR.keywordHintsEnabled] as? Bool ?? true,
+            externalASR: externalASR
         )
+    }
+
+    func numericTimeInterval(_ raw: Any?) -> TimeInterval? {
+        if let value = raw as? Double {
+            return value
+        }
+        if let value = raw as? Int {
+            return TimeInterval(value)
+        }
+        return nil
+    }
+
+    func parseExternalASRSettings(_ object: [String: Any]?) -> ExternalASRSettings {
+        ExternalASRSettings(providerID: object?[ConfigSchema.ExternalASR.providerID] as? String)
     }
 
     func parseCustomStyles(_ rawStyles: [String: Any]?) -> [CustomTranscriptionStyle] {

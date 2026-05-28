@@ -70,6 +70,7 @@ struct MenuPermissionTests {
         ) == "API 来源：仅系统 ASR")
         #expect(UIStrings(language: .english).systemASREngineTitle(.classicSpeech) == "Recognition Engine: Classic Speech")
         #expect(UIStrings(language: .chinese).systemASREngineTitle(.appleOnlineSpeech) == "识别引擎：Apple 在线识别")
+        #expect(SystemASREngine(rawValue: "doubao_ime") == nil)
         #expect(UIStrings(language: .chinese).systemASRNoAPIBaseURL == "系统 ASR（不使用 API）")
         #expect(UIStrings(language: .chinese).apiKeyUnused == "未使用")
         #expect(UIStrings(language: .chinese).noLLMUsedForMode == "此模式不使用大模型")

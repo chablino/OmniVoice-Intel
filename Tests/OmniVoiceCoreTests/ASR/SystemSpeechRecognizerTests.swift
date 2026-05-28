@@ -53,6 +53,7 @@ struct SystemSpeechRecognizerTests {
         ])
         #expect(LiveASREngineFallbackPlanner.engines(primary: .classicSpeech) == [.classicSpeech])
         #expect(LiveASREngineFallbackPlanner.engines(primary: .appleOnlineSpeech) == [.appleOnlineSpeech])
+        #expect(LiveASREngineFallbackPlanner.engines(primary: .externalASR) == [.externalASR])
     }
 
     @Test
@@ -293,6 +294,7 @@ struct SystemSpeechRecognizerTests {
         coordinator.handleStartFailure(errorKind: "speech_not_authorized")
         #expect(coordinator.gateState == .startFailed(errorKind: "speech_not_authorized"))
     }
+
 }
 
 private final class FakeLiveASRSession: LiveSystemSpeechRecognitionSession, @unchecked Sendable {
