@@ -96,11 +96,6 @@ enum NativeGlassSurfaceStyle {
             return status == .warning ? 0.32 : 0.28
         }
     }
-
-    @available(macOS 26.0, *)
-    static func glassStyle(role: GlassSurfaceRole, status: HUDStatusTone) -> NSGlassEffectView.Style {
-        .regular
-    }
 }
 
 enum SurfaceDepthMetrics {

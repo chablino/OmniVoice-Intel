@@ -11,6 +11,7 @@ struct NativeGlassBackplateDescriptor {
 final class NativeGlassBackplate {
     private weak var owner: NSView?
     private var glassView: NSView?
+    private var glassViewIsNativeGlass = false
     private var scrimView: GlassScrimView?
 
     init(owner: NSView) {
@@ -26,17 +27,16 @@ final class NativeGlassBackplate {
     ) {
         remove()
         guard surface == .nativeGlass,
-              #available(macOS 26.0, *),
-              let owner else {
+              let owner,
+              let glass = NativeGlassEffectBridge.makeGlassView(
+                  frame: owner.bounds,
+                  cornerRadius: cornerRadius,
+                  tintColor: NativeGlassSurfaceStyle.tintColor(status: status, readability: readability)
+              ) else {
             return
         }
 
-        let glass = NSGlassEffectView(frame: owner.bounds)
         glass.translatesAutoresizingMaskIntoConstraints = false
-        glass.cornerRadius = cornerRadius
-        glass.style = NativeGlassSurfaceStyle.glassStyle(role: role, status: status)
-        glass.tintColor = NativeGlassSurfaceStyle.tintColor(status: status, readability: readability)
-        glass.alphaValue = 1
         owner.addSubview(glass, positioned: .below, relativeTo: nil)
         pinToOwner(glass, owner: owner)
 
@@ -48,6 +48,7 @@ final class NativeGlassBackplate {
         pinToOwner(scrim, owner: owner)
 
         glassView = glass
+        glassViewIsNativeGlass = true
         scrimView = scrim
     }
 
@@ -66,13 +67,11 @@ final class NativeGlassBackplate {
         status: HUDStatusTone,
         readability: GlassReadabilityStyle
     ) {
-        guard #available(macOS 26.0, *) else {
-            return
-        }
-        if let glass = glassView as? NSGlassEffectView {
-            glass.style = NativeGlassSurfaceStyle.glassStyle(role: role, status: status)
-            glass.tintColor = NativeGlassSurfaceStyle.tintColor(status: status, readability: readability)
-            glass.alphaValue = 1
+        if glassViewIsNativeGlass, let glassView {
+            NativeGlassEffectBridge.updateAppearance(
+                of: glassView,
+                tintColor: NativeGlassSurfaceStyle.tintColor(status: status, readability: readability)
+            )
         } else if let effect = glassView as? NSVisualEffectView {
             effect.alphaValue = readability.materialAlpha
             effect.appearance = NSAppearance(named: .darkAqua)
@@ -89,9 +88,8 @@ final class NativeGlassBackplate {
     }
 
     func updateCornerRadius(_ cornerRadius: CGFloat) {
-        if #available(macOS 26.0, *),
-           let glass = glassView as? NSGlassEffectView {
-            glass.cornerRadius = cornerRadius
+        if glassViewIsNativeGlass, let glassView {
+            NativeGlassEffectBridge.updateCornerRadius(cornerRadius, of: glassView)
         } else if let effect = glassView as? NSVisualEffectView {
             effect.layer?.cornerRadius = cornerRadius
         }
@@ -105,6 +103,7 @@ final class NativeGlassBackplate {
     private func remove() {
         glassView?.removeFromSuperview()
         glassView = nil
+        glassViewIsNativeGlass = false
         scrimView?.removeFromSuperview()
         scrimView = nil
     }
@@ -129,5 +128,33 @@ final class NativeGlassBackplate {
             view.topAnchor.constraint(equalTo: owner.topAnchor),
             view.bottomAnchor.constraint(equalTo: owner.bottomAnchor)
         ])
+    }
+}
+
+private enum NativeGlassEffectBridge {
+    private static let className = "NSGlassEffectView"
+
+    static func makeGlassView(frame: CGRect, cornerRadius: CGFloat, tintColor: NSColor?) -> NSView? {
+        guard let viewClass = NSClassFromString(className) as? NSView.Type else {
+            return nil
+        }
+        let view = viewClass.init(frame: frame)
+        setRegularStyle(on: view)
+        updateCornerRadius(cornerRadius, of: view)
+        updateAppearance(of: view, tintColor: tintColor)
+        return view
+    }
+
+    static func updateAppearance(of view: NSView, tintColor: NSColor?) {
+        view.setValue(tintColor, forKey: "tintColor")
+        view.alphaValue = 1
+    }
+
+    static func updateCornerRadius(_ cornerRadius: CGFloat, of view: NSView) {
+        view.setValue(NSNumber(value: Double(cornerRadius)), forKey: "cornerRadius")
+    }
+
+    private static func setRegularStyle(on view: NSView) {
+        view.setValue(NSNumber(value: 0), forKey: "style")
     }
 }

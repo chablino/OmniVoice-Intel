@@ -341,11 +341,6 @@ struct HUDAndActionPanelTests {
         #expect(NativeGlassSurfaceStyle.bottomShadeAlpha(role: .hud, status: .normal) == 0)
         #expect(NativeGlassSurfaceStyle.topSheenAlpha(role: .actionPanel, status: .normal) == 0)
         #expect(NativeGlassSurfaceStyle.bottomShadeAlpha(role: .actionPanel, status: .normal) == 0)
-        if #available(macOS 26.0, *) {
-            #expect(NativeGlassSurfaceStyle.glassStyle(role: .actionPanel, status: .normal) == .regular)
-            #expect(NativeGlassSurfaceStyle.glassStyle(role: .actionPanel, status: .warning) == .regular)
-            #expect(NativeGlassSurfaceStyle.glassStyle(role: .hud, status: .normal) == .regular)
-        }
         #expect(
             NativeGlassSurfaceStyle.innerRimAlpha(status: .normal, role: .actionPanel)
                 > NativeGlassSurfaceStyle.innerRimAlpha(status: .normal, role: .hud)
