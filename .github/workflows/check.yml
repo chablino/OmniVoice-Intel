@@ -9,7 +9,7 @@ on:
 jobs:
   swift:
     name: Swift tests and app build
-    runs-on: macos-15
+    runs-on: macos-26-intel
     steps:
       - name: Checkout
         uses: actions/checkout@v4
