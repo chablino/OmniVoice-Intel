@@ -22,7 +22,7 @@ extension ConfigurationTests {
         #expect(!raw.contains("description_zh"))
         #expect(!raw.contains("allow_apple_server_recognition"))
         #expect(!raw.contains(#""legacy_private_asr""#))
-        #expect(!raw.contains(#""doubao_ime""#))
+        #expect(!raw.contains(#""legacy_private_asr""#))
         #expect(!raw.contains("Acme ASR settings"))
 
         let normalized = try #require(JSONCNormalizer.normalize(raw).data(using: .utf8))
@@ -131,7 +131,7 @@ extension ConfigurationTests {
         let systemASR = try #require(object["system_asr"] as? [String: Any])
         #expect(systemASR["engine"] as? String == "classic_speech")
         #expect(systemASR["keyword_hints_enabled"] as? Bool == false)
-        #expect(systemASR["doubao_ime"] == nil)
+        #expect(systemASR["legacy_private_asr"] == nil)
 
         #expect(store.saveModelAndPipelineSettings(
             inputAudioModel: .mimoV25,
@@ -149,7 +149,7 @@ extension ConfigurationTests {
         #expect(externalSystemASR["engine"] as? String == "external_asr")
         let externalASR = try #require(externalSystemASR["external_asr"] as? [String: Any])
         #expect(externalASR["provider_id"] as? String == "acme-asr")
-        #expect(externalSystemASR["doubao_ime"] == nil)
+        #expect(externalSystemASR["legacy_private_asr"] == nil)
     }
 
     @Test

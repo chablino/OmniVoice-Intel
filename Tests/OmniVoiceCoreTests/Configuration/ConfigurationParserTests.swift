@@ -210,22 +210,15 @@ extension ConfigurationTests {
     }
 
     @Test
-    func configLoaderFallsBackWhenLegacyDoubaoIMEEngineIsPresent() throws {
-        let fixture = try configFixture(slug: "omnivoice-legacy-doubao-asr")
+    func configLoaderFallsBackWhenRemovedPrivateASREngineIsPresent() throws {
+        let fixture = try configFixture(slug: "omnivoice-legacy-private-asr")
         try fixture.write("""
         {
           "active_source": "auto",
           "transcription_pipeline": { "mode": "system_asr_only" },
           "system_asr": {
-            "engine": "doubao_ime",
-            "keyword_hints_enabled": true,
-            "doubao_ime": {
-              "enabled": true,
-              "node_executable": "/opt/homebrew/bin/node",
-              "cli_path": "~/to7for/mine/doubaoASR/doubaoime-asr-nodejs/dist/cli.mjs",
-              "credential_path": "~/to7for/mine/doubaoASR/doubaoime-asr-nodejs/credentials-asr-test.json",
-              "timeout_seconds": 45
-            }
+            "engine": "removed_private_asr",
+            "keyword_hints_enabled": true
           },
           "preferences": {
             "ui_language": "zh-Hans",
